@@ -61,11 +61,12 @@ class MyHierarchyIcons
             string relativePath = System.IO.Path.GetDirectoryName(AssetDatabase.GUIDToAssetPath(scriptGuid));
             iconInfoList = new List<EditorHierarchyIconInfo>()
             {
-                new EditorHierarchyIconInfo(typeof(Camera), relativePath + "/Icons/iconCamera.png", new Color(207,233,255)),
+                new EditorHierarchyIconInfo(typeof(Camera), relativePath + "/Icons/iconCamera.png", Color.magenta),
                 new EditorHierarchyIconInfo(typeof(UnityEngine.UI.Text), relativePath + "/Icons/TextIcon.png", Color.cyan),
                 new EditorHierarchyIconInfo(typeof(UnityEngine.UI.Button), relativePath + "/Icons/ButtonIcon.png", Color.green),
                 new EditorHierarchyIconInfo(typeof(UnityEngine.UI.Image), relativePath + "/Icons/ImageIcon.png", Color.red),
                 new EditorHierarchyIconInfo(typeof(AudioSource), relativePath + "/Icons/AudioSourceIcon.png", Color.yellow),
+                new EditorHierarchyIconInfo(typeof(Light), relativePath + "/Icons/lightIcon.png", new Color(0.416f,0.694f,0.925f)),
                 //new EditorHierarchyIconInfo(typeof(Dummy), relativePath + "/Icons/iconDummy.png"),
                 //new EditorHierarchyIconInfo(typeof(Replica.IModule), relativePath + "/Icons/iconModule.png"),
             };
@@ -79,26 +80,52 @@ class MyHierarchyIcons
 
         GameObject go = EditorUtility.InstanceIDToObject (instanceID) as GameObject;
 
-        if (go != null)
+        string scriptGuid = AssetDatabase.FindAssets(typeof(MyHierarchyIcons).Name + " t:script").FirstOrDefault();
+		string relativePath = System.IO.Path.GetDirectoryName(AssetDatabase.GUIDToAssetPath(scriptGuid));
+		var icon = AssetDatabase.LoadAssetAtPath(relativePath + "/Icons/blacklighter.png", typeof(Texture2D)) as Texture2D;
+		//if (icon != null)
+		//{
+		//	try
+		//	{
+
+		//		icon.width = 12;
+		//		icon.height = 12;
+		//	}
+		//	catch (System.Exception e)
+		//	{
+		//		Debug.LogWarning("Error icon in HierarchyIcons : " + e);
+		//	}
+		//}
+
+		if (go != null)
         {
             Rect r = new Rect (selectionRect);
+           
             float width, height;
+			
+			
             GUI.skin.label.CalcMinMaxWidth(new GUIContent(go.name), out width, out height);
-            r.x += width;
+
+			r.x += width;
             r.y += 2;
             r.width = 16;
             r.height = 16;
-            iconInfoList.ForEach(info =>
+			iconInfoList.ForEach(info =>
             {
                 if (info.icon != null && go.GetComponent(info.type))
                 {
-                    GUI.Label(r, info.icon);
-					GUI.backgroundColor = info.color;
-					//doing this three times because once is kind of transparent.
-					GUI.Box(selectionRect, "");
-					GUI.Box(selectionRect, "");
-					GUI.Box(selectionRect, "");
+					GUI.Label(r, info.icon);
+					GUI.color = info.color;
+					GUI.DrawTexture(selectionRect, icon);//, ScaleMode.StretchToFill,true);
 					GUI.color = Color.white;
+
+					//GUI.color = info.color;
+					//doing this three times because once is kind of transparent.
+					//GUI.backgroundColor = info.color;
+					//GUI.Box(selectionRect, "");
+					//GUI.Box(selectionRect, "");
+					//GUI.Box(selectionRect, "");
+					//GUI.backgroundColor = Color.white;
 					EditorApplication.RepaintHierarchyWindow();
 					r.x += r.width + 2;
                 }
